@@ -1,4 +1,5 @@
-Effective Java                 Joshua Bloch         9780134685991   4
-Java Concurrency in Practice   Brian Goetz          9780321349606   2
-Spring in Action               Craig Walls          9781617294945   2
-Spring in Action               Craig Walls          9781617294945   2
+Clean Code:Robert Martin:9780132350884:3
+Effective Java:Joshua Bloch:9780134685991:4
+Java Concurrency in Practice:Brian Goetz:9780321349606:2
+Refactoring:Martin Fowler:9780201485677:3
+Spring in Action:Craig Walls:9781617294945:2

@@ -11,6 +11,14 @@ public class LibraryBookTracker {
     private static int booksAddedCount = 0;
     private static int errorCount = 0;
 
+    public static void incrementValidRecords() {
+    validRecordsCount++;
+}
+
+public static void incrementErrors() {
+    errorCount++;
+}
+
     // Log file reference
     private static File logFile;
 
@@ -38,11 +46,16 @@ public class LibraryBookTracker {
             if (parentDir == null) parentDir = new File(".");
             logFile = new File(parentDir, "errors.log");
 
-            // Load valid book records
-            List<Book> books = loadCatalog(catalogFile);
+           List<Book> books = new ArrayList<>();
 
-            // Execute requested operation
-            executeOperation(args[1], books, catalogFile);
+         Thread fileThread = new Thread(new FileReaderTask(args[0], books));
+         Thread opThread = new Thread(new OperationAnalyzerTask(args[1], books, catalogFile));
+
+        fileThread.start();
+         fileThread.join();
+
+         opThread.start();
+         opThread.join();
 
         } catch (BookCatalogException e) {
             System.out.println("Error: " + e.getMessage());
@@ -105,7 +118,7 @@ public class LibraryBookTracker {
     /**
      * Parses a line and validates its structure and fields.
      */
-    private static Book parseAndValidateBook(String line)
+    public static Book parseAndValidateBook(String line)
             throws BookCatalogException {
 
         String[] parts = line.split(":");
@@ -147,7 +160,7 @@ throw new MalformedBookEntryException("Title is empty.");
     /**
      * Determines which operation to perform.
      */
-    private static void executeOperation(String arg,List<Book> books,File catalogFile) throws BookCatalogException {
+    public static void executeOperation(String arg,List<Book> books,File catalogFile) throws BookCatalogException {
         if (arg.matches("\\d{13}")) {
             searchByISBN(books, arg);
         }
@@ -214,7 +227,7 @@ throw new MalformedBookEntryException("Title is empty.");
         // Rewrite the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(catalogFile))) {
             for (Book book : books)
-                writer.println(book.toString());
+               writer.println(book.toFileString());
         } catch (IOException e) {
             errorCount++;
         }
@@ -234,7 +247,7 @@ throw new MalformedBookEntryException("Title is empty.");
     /**
      * Logs errors into errors.log file.
      */
-    private static void logError(String type, String input, Exception e) {
+    public static void logError(String type, String input, Exception e) {
 
         try (PrintWriter out =
                      new PrintWriter(new FileWriter(logFile, true))) {
